@@ -1,0 +1,12 @@
+component,variant,unit,quantity,rows_per_unit,estimated_rows,label,model,assumptions
+discrete-Gaussian sampler,Box-Muller (per sample),sample,64,3740,239360,ESTIMATED,2*270 (uniforms) + 1200 (ln) + 400 (sqrt) + 1600 (sin/cos),Fixed-point transcendentals approximated by range reduction plus polynomial; two Poseidon-derived uniforms per sample.
+discrete-Gaussian sampler,Box-Muller (per release),release,1,239360,239360,ESTIMATED,64 samples x 3740 rows/sample,One release draws m=64 independent normals.
+discrete-Gaussian sampler,plookup inversion (per sample),sample,64,14,896,ESTIMATED,2 x 3 (table reads) + 2 x 4 (range checks),Inverse-CDF lookup over a 2^12-entry table; no transcendental circuit.
+discrete-Gaussian sampler,plookup inversion (per release),release,1,896,896,ESTIMATED,64 samples x 14 rows/sample,"Assumes the 2^12 table is fixed public parameters, so it is not re-proved."
+discrete-Gaussian sampler,plookup table commitment (one-time),table entry,4096,135,552960,ESTIMATED,ceil(4096/2) = 2048 Poseidon permutations,Only charged if the table is committed per proof; fixed public parameters cost 0 rows.
+RDP accountant step,per-order arithmetic,order,63,52,3276,ESTIMATED,per order: 4 x 12 (mul/div) + 4 (range check),"log(1/delta) is a public constant; sigma, delta_f and the per-order sums are private."
+RDP accountant step,min-reduction over orders,comparison,62,18,1116,ESTIMATED,62 pairwise min comparisons,Tree reduction over the 63 per-order certificates.
+Poseidon commitment recomputation,7 digests over D and theta,permutation,772,270,208440,ESTIMATED,ceil((m*d + d*w + 7)/2) = 772 permutations,Absorbs the full private batch D (m*d) and model theta (d*w); rate 2.
+Poseidon commitment recomputation,limb packing for public instance,limb,56,2,112,ESTIMATED,7 digests x 8 limbs x 2 rows,128-bit digests split into eight 16-bit limbs for the public output.
+TOTAL,Box-Muller sampler variant,release,1,452304,452304,ESTIMATED,239360 (sampler) + 4392 (RDP) + 208552 (Poseidon),"Sum of the Box-Muller sampler, accountant and commitment recomputation rows."
+TOTAL,plookup sampler variant,release,1,213840,213840,ESTIMATED,896 (sampler) + 4392 (RDP) + 208552 (Poseidon),"Assumes the lookup table is fixed public parameters, not re-proved."

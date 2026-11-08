@@ -6,3 +6,6 @@ mlp_h384,1,61048,16,86017,30,0.0487,0.0072,2.5759,0.0679,2.9401,18.418,21.44,117
 mlp_h512,1,97720,17,147457,30,0.0681,0.012,5.0121,0.11,5.782,47.625,21.502,1323.59,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h512,15.7,,ok,
 mlp_h768,1,195640,18,319489,30,0.1504,0.0284,9.9036,0.2043,12.5645,106.016,21.481,1527.81,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h768,30.0,,ok,
 mlp_h1024,1,326328,19,557057,30,0.2193,0.0543,22.1955,0.4456,34.6493,2271.382,21.527,2487.28,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h1024,71.8,,ok,
+tiny_cnn,1,210228,18,18490,768,0.1676,0.0041,21.4287,0.161,58.2438,1599.114,138.295,1915.12,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/tiny_cnn,91.0,,ok,
+cnn_c4_8_fc32,1,95988,17,4866,768,0.1199,0.0028,11.8488,0.1233,16.2175,117.277,138.347,1418.39,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c4_8_fc32,36.2,,ok,
+cnn_c8_16_fc64,1,210228,18,18490,768,0.1767,0.0051,21.9091,0.2258,43.6787,1267.418,138.29,1813.69,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c8_16_fc64,77.1,,ok,

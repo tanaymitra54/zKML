@@ -245,6 +245,11 @@ graph TD
     ROOT --> Z["zk/  (Track D — planned)"]
     ROOT --> T["tests/"]
     ROOT --> RES["results/  fig3..fig9"]
+    ROOT --> DEMO["demo/  (pitch demo)"]
+
+    DEMO --> D1["pipeline.py"]
+    DEMO --> D2["run_release.py"]
+    DEMO --> D3["app.py"]
 
     A --> A1["accounting.py"]
     A --> A2["constraints.py"]
@@ -278,12 +283,18 @@ dpzkml/
 ├── quant/                      # Track C — quantized reference query
 │   └── reference_query.py      #   int8 aggregate, clipping, sensitivity, field bound
 ├── zk/                         # Track D — ZK relation + verifier (planned)
+├── demo/                       # Presentation layer (adds no protocol logic)
+│   ├── pipeline.py             #   one release: input → process → output → verify
+│   ├── run_release.py          #   terminal demo, four rejected attacks
+│   ├── app.py                  #   Streamlit four-panel console
+│   └── README.md               #   beat sheet + what is real vs Track D stub
 ├── tests/                      # pytest suites
 │   ├── test_a_accounting.py
 │   ├── test_a_constraints.py
 │   ├── test_a_utility.py
 │   ├── test_a_verification.py
-│   └── test_b_dp.py
+│   ├── test_b_dp.py
+│   └── test_demo_pipeline.py
 └── results/                    # generated figures (fig3..fig9 .png)
 ```
 
@@ -338,12 +349,24 @@ classDiagram
 ```bash
 python -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                          # 15 tests
+pytest -q                          # 23 tests
 python -m analysis.figures         # regenerates results/fig3..fig9
 ```
 
 **Requirements:** Python 3.11+, `numpy`, `scipy`, `matplotlib`, `pytest`. No other runtime
 dependencies — the ledger uses stdlib `sqlite3`.
+
+### Live demo (presentation layer)
+
+```bash
+pip install -r demo/requirements-demo.txt
+python -m demo.run_release         # one release + four rejected attacks
+streamlit run demo/app.py          # four-panel browser console
+```
+
+`demo/` adds no protocol logic; it choreographs one release for a recorded
+walkthrough and labels the unimplemented proof backend `NOT BOUND` rather than
+implying verification. See [`demo/README.md`](demo/README.md).
 
 ---
 
@@ -493,16 +516,18 @@ formulas — never labeled accuracy, milliseconds, or proof size (paper Sec. VII
 ## Testing
 
 ```bash
-pytest -q                 # 15 passed
+pytest -q                 # 23 passed
 pytest -q -k test_a       # Track A only
 pytest -q -k test_b       # Track B only
+pytest -q -k test_demo    # presentation layer
 ```
 
 ```mermaid
 pie showData
-    title "Test distribution (15 total)"
+    title "Test distribution (23 total)"
     "Track A — analysis" : 10
     "Track B — dp" : 5
+    "Demo — protocol beats" : 8
 ```
 
 Each non-trivial module also carries a runnable `__main__` self-check:

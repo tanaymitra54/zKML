@@ -1,0 +1,7 @@
+# Extra dependencies for the zk/ workload harness (on top of requirements.txt).
+# EZKL 23.0.5 ships a cp37-abi3 wheel: it installs on this repo's py3.15 venv.
+ezkl==23.0.5
+torch>=2.5
+onnx>=1.16
+onnxscript>=0.2
+scikit-learn>=1.5

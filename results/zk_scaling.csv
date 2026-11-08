@@ -9,3 +9,4 @@ mlp_h1024,1,326328,19,557057,30,0.2193,0.0543,22.1955,0.4456,34.6493,2271.382,21
 tiny_cnn,1,210228,18,18490,768,0.1676,0.0041,21.4287,0.161,58.2438,1599.114,138.295,1915.12,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/tiny_cnn,91.0,,ok,
 cnn_c4_8_fc32,1,95988,17,4866,768,0.1199,0.0028,11.8488,0.1233,16.2175,117.277,138.347,1418.39,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c4_8_fc32,36.2,,ok,
 cnn_c8_16_fc64,1,210228,18,18490,768,0.1767,0.0051,21.9091,0.2258,43.6787,1267.418,138.29,1813.69,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c8_16_fc64,77.1,,ok,
+cnn_c16_32_fc128,1,507156,19,72042,768,0.2675,0.0097,79.726,0.4509,206.6122,3706.533,138.294,2158.23,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c16_32_fc128,304.3,,ok,

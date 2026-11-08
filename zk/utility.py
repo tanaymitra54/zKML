@@ -25,7 +25,8 @@ ELSEVIER = Path(
 
 EPSILONS = [0.5, 1.0, 2.0, 4.0, 8.0]
 DELTA = 1e-5
-FIELDS = ["workload", "epsilon", "delta", "sigma", "sensitivity_l2", "accuracy", "n_test", "seed"]
+FIELDS = ["workload", "epsilon", "delta", "sigma", "sensitivity_l2", "accuracy",
+          "accuracy_std", "n_trials", "clean_accuracy", "n_test", "seed"]
 
 
 def _gaussian_sigma(eps: float, delta: float, sensitivity: float) -> float:
@@ -68,7 +69,7 @@ def _accuracy(
     return float((pred == yt).mean())
 
 
-def evaluate(seed: int = 0) -> list[dict]:
+def evaluate(seed: int = 0, n_trials: int = 25) -> list[dict]:
     rows: list[dict] = []
     bundles = [
         mlp_tabular(seed=seed),
@@ -85,7 +86,13 @@ def evaluate(seed: int = 0) -> list[dict]:
         print(f"{bundle.name} clean_acc={clean:.4f}", flush=True)
         for eps in EPSILONS:
             sigma = _gaussian_sigma(eps, DELTA, sens)
-            acc = _accuracy(model, bundle.x_test, bundle.y_test, bundle.task, sigma, rng)
+            # One noise draw per epsilon would be noise, not a measurement: a
+            # single bad draw can invert the eps ordering. Average n_trials.
+            draws = [
+                _accuracy(model, bundle.x_test, bundle.y_test, bundle.task, sigma, rng)
+                for _ in range(n_trials)
+            ]
+            acc = float(np.mean(draws))
             rows.append(
                 {
                     "workload": bundle.name,
@@ -94,11 +101,15 @@ def evaluate(seed: int = 0) -> list[dict]:
                     "sigma": round(sigma, 6),
                     "sensitivity_l2": round(sens, 6),
                     "accuracy": round(acc, 6),
+                    "accuracy_std": round(float(np.std(draws)), 6),
+                    "n_trials": n_trials,
+                    "clean_accuracy": round(clean, 6),
                     "n_test": int(len(bundle.x_test)),
                     "seed": seed,
                 }
             )
-            print(f"{bundle.name} eps={eps}: acc={acc:.4f} sigma={sigma:.4f} sens={sens:.4f}", flush=True)
+            print(f"{bundle.name} eps={eps}: acc={acc:.4f}+-{np.std(draws):.4f} "
+                  f"sigma={sigma:.4f} sens={sens:.4f}", flush=True)
     return rows
 
 

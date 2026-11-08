@@ -1,0 +1,5 @@
+workload,scale_bits,epochs,n_params,split,n_test,accuracy_float,accuracy_quant,accuracy_delta,agreement,max_logit_delta,status,error
+mlp_tabular,8,3,4097,test,143,0.951,0.951,0.0,1.0,0.2071,ok,
+mlp_h256,8,2,40961,test,143,0.958,0.958,0.0,1.0,0.3356,ok,
+tiny_cnn,8,2,18490,test,500,0.308,0.302,-0.006,0.976,0.0996,ok,
+cnn_c8_16_fc64,8,2,18490,test,500,0.262,0.266,0.004,0.986,0.0868,ok,

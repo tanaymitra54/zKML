@@ -100,6 +100,7 @@ def _attempt(
     calibrate: bool,
     drop_proving_key: bool,
     tag: str,
+    run_args=None,
 ) -> dict:
     """Run the full pipeline once at one scale setting. Raises on failure."""
     suffix = f"_{tag}" if tag else ""
@@ -111,7 +112,10 @@ def _attempt(
     proof_path = work_dir / f"proof{suffix}.json"
 
     t0 = time.perf_counter()
-    if scale_bits is None:
+    if run_args is not None:
+        if not ezkl.gen_settings(str(onnx_path), str(settings_path), py_run_args=run_args):
+            raise RuntimeError("gen_settings returned False")
+    elif scale_bits is None:
         ezkl.gen_settings(str(onnx_path), str(settings_path))
     else:
         args = ezkl.PyRunArgs()
@@ -190,6 +194,98 @@ def _attempt(
         "proof_path": str(proof_path),
         "witness_path": str(witness_path),
     }
+
+
+def measure_prepared(
+    model,
+    inputs: list,
+    work_dir: Path,
+    *,
+    input_names: list[str],
+    output_names: list[str] | None = None,
+    name: str = "prepared",
+    train_epochs: int = 0,   # kept for signature parity; ignored (model is given)
+    calibrate: bool = False,
+    drop_proving_key: bool = True,
+    input_visibility: str = "private",
+    output_visibility: str = "public",
+    input_scale: int = 7,
+) -> RunResult:
+    """Measure an already-built model with an explicit input list.
+
+    This is the entry point used by ``zk.binding`` for the bare/bound toggle:
+    the caller decides how many graph inputs there are and what the public
+    instance contains.  Every number still comes from ``_attempt``.
+    """
+    import ezkl
+    import torch
+
+    work_dir.mkdir(parents=True, exist_ok=True)
+    onnx_path = work_dir / "model.onnx"
+    torch.onnx.export(
+        model.eval(),
+        tuple(inputs),
+        str(onnx_path),
+        input_names=input_names,
+        output_names=output_names or ["output"],
+        opset_version=17,
+        dynamo=False,
+    )
+    data_path = work_dir / "input.json"
+    # EZKL 23.0.5: one entry per graph input, in graph order.
+    data_path.write_text(json.dumps({"input_data": [t.detach().cpu().reshape(-1).tolist()
+                                                    for t in inputs]}))
+
+    errors: list[str] = []
+    out: dict | None = None
+    for attempt, scale in enumerate((input_scale, 12, 14)):
+        args = ezkl.PyRunArgs()
+        args.input_visibility = input_visibility
+        args.output_visibility = output_visibility
+        args.param_visibility = "fixed"
+        args.input_scale = int(scale)
+        args.param_scale = int(scale)
+        args.scale_rebase_multiplier = 1
+        try:
+            out = _attempt(
+                onnx_path=onnx_path,
+                data_path=data_path,
+                work_dir=work_dir,
+                logrows_hint=True,
+                scale_bits=scale,
+                calibrate=calibrate,
+                drop_proving_key=drop_proving_key,
+                tag="" if attempt == 0 else f"s{scale}",
+                run_args=args,
+            )
+            break
+        except Exception as exc:  # noqa: BLE001 - try the next scale, keep the trace
+            errors.append(f"scale={scale}: {type(exc).__name__}: {exc}")
+            print(f"warn: attempt {attempt + 1} failed ({errors[-1]})", file=sys.stderr)
+    if out is None:
+        raise RuntimeError(" | ".join(errors))
+    return RunResult(
+        name=name,
+        batch=1,
+        num_rows=int(out["num_rows"]),
+        logrows=int(out["logrows"]),
+        n_params=int(sum(p.numel() for p in model.parameters())),
+        input_dim=int(inputs[0].numel()),
+        settings_s=float(out["settings_s"]),
+        compile_s=float(out["compile_s"]),
+        setup_s=float(out["setup_s"]),
+        witness_s=float(out["witness_s"]),
+        prove_s=float(out["prove_s"]),
+        verify_ms=float(out["verify_ms"]),
+        proof_kb=float(out["proof_kb"]),
+        peak_rss_mb=float(out["peak_rss_mb"]),
+        verified=bool(out["verified"]),
+        work_dir=str(work_dir),
+        scale_bits=int(out["scale_bits"]),
+        attempts=1,
+        status="ok" if out["verified"] else "verify_failed",
+        error="",
+    )
 
 
 def measure(
@@ -275,6 +371,10 @@ def _cli() -> int:
 
     from zk import workloads as W
 
+    def _binding_configs():
+        from zk.binding import CONFIGS
+        return set(CONFIGS)
+
     ap = argparse.ArgumentParser(description="bench one workload config")
     ap.add_argument("--config", required=True)
     ap.add_argument("--work-dir", required=True)
@@ -284,7 +384,20 @@ def _cli() -> int:
     ap.add_argument("--no-calibrate", action="store_true")
     ap.add_argument("--keep-keys", action="store_true",
                     help="keep the multi-GB proving key (default: delete after verify)")
+    ap.add_argument("--binding", choices=("none", "bare", "bound"), default="none",
+                    help="none: plain workload; bare/bound: synthetic binding-layer harness")
     a = ap.parse_args()
+
+    if a.binding != "none":
+        if a.config not in _binding_configs():
+            print(f"--binding {a.binding} only applies to {sorted(_binding_configs())}",
+                  file=sys.stderr)
+            return 2
+        from zk.binding import _measure_bare_or_bound
+
+        row = _measure_bare_or_bound(a.config, a.binding, Path(a.work_dir))
+        print(json.dumps(row))
+        return 0 if row.get("verified") else 1
 
     factory = W.FACTORIES.get(a.config)
     if factory is None:

@@ -17,6 +17,6 @@ def test_a_verification_density_integrates_near_one():
     # Density of IV on truncated support [exp(mu-3σ), exp(mu+3σ)].
     xs, dens = verification_density(s=32, n=512)
     # Trapezoid on linear IV axis; truncate tails as in Fig. 8.
-    trapz = getattr(np, "trapezoid", np.trapz)
+    trapz = getattr(np, "trapezoid", None) or getattr(np, "trapz")  # NumPy 2 removed trapz
     mass = float(trapz(dens, xs))
     assert 0.95 < mass < 1.05

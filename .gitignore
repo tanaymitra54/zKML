@@ -4,3 +4,9 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .DS_Store
+
+# large generated artefacts
+results/artifacts/
+zk/data/
+results/*.lock
+results/*_run.log

@@ -1,0 +1,12 @@
+name,batch,num_rows,logrows,n_params,input_dim,settings_s,compile_s,setup_s,witness_s,prove_s,verify_ms,proof_kb,peak_rss_mb,verified,scale_bits,attempts,work_dir,wall_s,system,status,error
+mlp_tabular,1,5208,15,4097,30,0.0563,0.0016,1.0549,0.0152,1.2664,10.97,21.485,795.36,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_tabular,6.9,,ok,
+mlp_h128,1,12280,15,12289,30,0.0207,0.0019,1.1844,0.0212,1.4019,10.318,21.521,823.3,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h128,5.9,,ok,
+mlp_h256,1,32568,15,40961,30,0.031,0.0061,1.3098,0.0406,1.5443,11.501,21.493,872.73,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h256,6.4,,ok,
+mlp_h384,1,61048,16,86017,30,0.0487,0.0072,2.5759,0.0679,2.9401,18.418,21.44,1175.22,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h384,9.7,,ok,
+mlp_h512,1,97720,17,147457,30,0.0681,0.012,5.0121,0.11,5.782,47.625,21.502,1323.59,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h512,15.7,,ok,
+mlp_h768,1,195640,18,319489,30,0.1504,0.0284,9.9036,0.2043,12.5645,106.016,21.481,1527.81,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h768,30.0,,ok,
+mlp_h1024,1,326328,19,557057,30,0.2193,0.0543,22.1955,0.4456,34.6493,2271.382,21.527,2487.28,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/mlp_h1024,71.8,,ok,
+tiny_cnn,1,210228,18,18490,768,0.1676,0.0041,21.4287,0.161,58.2438,1599.114,138.295,1915.12,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/tiny_cnn,91.0,,ok,
+cnn_c4_8_fc32,1,95988,17,4866,768,0.1199,0.0028,11.8488,0.1233,16.2175,117.277,138.347,1418.39,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c4_8_fc32,36.2,,ok,
+cnn_c8_16_fc64,1,210228,18,18490,768,0.1767,0.0051,21.9091,0.2258,43.6787,1267.418,138.29,1813.69,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c8_16_fc64,77.1,,ok,
+cnn_c16_32_fc128,1,507156,19,72042,768,0.2675,0.0097,79.726,0.4509,206.6122,3706.533,138.294,2158.23,true,0,1,/Users/tanaymitra/Documents/Projects/zKML/zKML/results/artifacts/scaling/cnn_c16_32_fc128,304.3,,ok,
